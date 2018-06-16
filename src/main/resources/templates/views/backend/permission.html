@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/admin">
+<head>
+    <title>Quản lý chức năng - Hệ thống hỗ trợ khách hàng VNPOST</title>
+    <th:block th:fragment="css">
+        <link th:href="@{/assets/select2/select2.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/assets/jquery-multi-select/multi-select.css}"  rel="stylesheet" type="text/css" />
+        <link th:href="@{/assets/nestable/jquery.nestable.css}" rel="stylesheet" />
+    </th:block>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 class="pull-left page-title">QUẢN LÝ CHỨC NĂNG</h4>
+                <ol class="breadcrumb pull-right">
+                    <li><a th:href="@{/admin/home}">Trang chủ</a></li>
+                    <li class="active">Quản lý chức năng</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <!--<div class="panel-heading">
+                    </div>-->
+                    <div class="panel-body">
+                        <button class="btn btn-success waves-effect waves-light m-b-5" id="btnAddPermission"><i class="fa fa-file-text-o"></i> Thêm chức năng</button>
+                        <button class="btn btn-primary waves-effect waves-light m-b-5" id="btnAddGroup"><i class="fa fa-list-ul"></i> Thêm nhóm chức năng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet">
+                    <div class="portlet-heading">
+                        <h3 class="portlet-title text-dark text-uppercase">
+                            Danh sách chức năng
+                        </h3>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="panel-collapse collapse in">
+                        <div class="portlet-body">
+                            <div class="dd" id="permissionTree">
+                                <th:block th:include="this::groupPermission(${lstData})"></th:block>
+                            </div>
+
+                            <!--Loop-->
+                            <th:block th:fragment="groupPermission(groupPermission)">
+                                <th:block th:each="item : ${groupPermission}">
+                                    <ol class="dd-list">
+                                        <li class="dd-item">
+                                            <div class="dd-handle dd-group">
+                                                [[${item.name}]]
+                                                <a class="blue actioninlink btneditgoup" href="javascript: ;" title="Sửa thông tin nhóm quyền" th:attr="data-id=${item.id}">
+                                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                                </a>
+                                                <a class="red actioninlink btndeletegroup" href="javascript: ;" title="Xóa nhóm quyền"
+                                                   th:attr="data-id=${item.id}">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                </a>
+                                            </div>
+                                            <th:block th:if="${not #lists.isEmpty(item.getPermissions())}">
+                                                <ol class="dd-list">
+                                                    <th:block th:each="permission : ${item.getPermissions()}">
+                                                        <li class="dd-item">
+                                                            <div class="dd-handle dd-permission">
+                                                                [[${permission.description}]]
+                                                                <a class="blue actioninlink btneditper" href="javascript: ;" title="Sửa thông tin chức năng"
+                                                                   th:attr="data-id=${permission.id }">
+                                                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                                                </a>
+                                                                <th:block th:if="${!permission.islock}">
+                                                                    <a th:attr="data-id=${permission.id }" class="red actioninlink btnlockper"
+                                                                       href="javascript: ;" title="Khóa chức năng">
+                                                                        <i class="ace-icon fa fa-unlock-alt bigger-130"></i>
+                                                                    </a>
+                                                                </th:block>
+                                                                <th:block th:if="${permission.islock}">
+                                                                    <a th:attr="data-id=${permission.id }" class="red actioninlink btnunlockper"
+                                                                       href="javascript: ;" title="Mở khóa chức năng">
+                                                                        <i class="ace-icon fa fa-lock bigger-130"></i>
+                                                                    </a>
+                                                                </th:block>
+
+                                                                <a class="red actioninlink btndelPer" href="javascript: ;" title="Xóa chức năng"
+                                                                   th:attr="data-id=${permission.id }">
+                                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                                </a>
+                                                            </div>
+                                                        </li>
+                                                    </th:block>
+                                                </ol>
+                                            </th:block>
+                                        </li>
+                                        <th:block th:unless="${#lists.isEmpty(item.getLstGroupPermissionModel())}" th:include="this::groupPermission(${item.getLstGroupPermissionModel()})"></th:block>
+                                    </ol>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade-scale" id="permissionModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-check-square-o"></i> Thêm mới chức năng</h4>
+                </div>
+                <form class="form-horizontal" id="frmFormPermission">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Tên chức năng</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="txtname" name="txtname" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Đường dẫn</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="txtlink" name="txtlink" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nhóm chức năng</label>
+                            <div class="col-sm-8">
+                                <select class="form-control select2 slgroup slgrper" name="slgrper">
+                                </select>
+                            </div>
+                            <button class="btn btn-sm btn-success btnaddgroup" title="Thêm mới nhóm quyền">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Khóa</label>
+                            <div class="col-sm-9">
+                                <div class="checkbox checkbox-danger">
+                                    <input id="checkbox2" type="checkbox">
+                                    <label for="checkbox2"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-b-5 btnModal"> <i class="fa fa-check-square-o"></i> Thêm mới</button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" style="margin-bottom: 5px;" data-dismiss="modal">
+                        <i class="fa fa-times"></i> Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade-scale" id="goupModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-check-square-o"></i> Thêm mới nhóm quyền</h4>
+                </div>
+                <form class="form-horizontal" id="frmFormAddGroup">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Tên nhóm quyền</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="txtnamegroup" name="txtnamegroup"
+                                       placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Thuộc nhóm quyền</label>
+                            <div class="col-sm-9">
+                                <select class="form-control select2 slgroup slgroupadd">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-b-5 btnGroupModal"><i class="fa fa-check-square-o"></i>
+                        Thêm mới
+                    </button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5 btnCloseGroupModal" style="margin-bottom: 5px;" data-dismiss="modal"><i class="fa fa-times"></i>
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" th:src="@{/assets/jquery.validate/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/assets/bootstrap3-editable/moment.min.js}"></script>
+    <script th:src="@{/assets/nestable/jquery.nestable.js}"></script>
+    <script th:src="@{/assets/select2/select2.min.js}" type="text/javascript"></script>
+    <script th:src="@{/backend/permission/permission.js}"></script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<th:block th:each="item,iter : ${lstRole}">
+    <tr>
+        <td class="text-center">[[${(iter.index + 1) + (currentpage - 1) * pageSize}]]</td>
+        <td>[[${item.rolename}]]</td>
+        <td class="actions text-center">
+            <a href="javascript: ;" th:attr="data-id=${item.id}" class="on-default edit-row btnedit" title="Cập nhật thông tin nhóm người dùng"><i class="fa fa-pencil"></i></a>
+            <a href="javascript: ;" th:attr="data-id=${item.id}" class="on-default remove-row btndelete" title="Xoá nhóm người dùng"><i class="fa fa-trash-o"></i></a>
+        </td>
+    </tr>
+</th:block>
+<input type="hidden" id="datatable" th:attr="data-total=${totalPage}, data-totalrecord=${total}, data-page=${currentpage}" />

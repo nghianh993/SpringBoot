@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      layout:decorator="layouts/admin">
+<head>
+    <title>Quản lý tài khoản - Hệ thống hỗ trợ khách hàng VNPOST</title>
+    <th:block th:fragment="css">
+        <link th:href="@{/css/chosen.min.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/assets/timepicker/bootstrap-datepicker.min.css}" rel="stylesheet" />
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 class="pull-left page-title">QUẢN LÝ NHÓM NGƯỜI DÙNG</h4>
+                <ol class="breadcrumb pull-right">
+                    <li><a th:href="@{/admin/home}">Trang chủ</a></li>
+                    <li class="active">Quản lý tài khoản</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <!--<div class="panel-heading">
+                    </div>-->
+                    <div class="panel-body">
+                        <div class="form-inline" role="form">
+                            <div class="form-group col-sm-4 col-xs-12">
+                                <input type="text" class="form-control" style="width: 100%;" id="txtsearchbox" placeholder="Nhập vào tên, email, tên đăng nhập...">
+                            </div>
+                            <button class="btn btn-info waves-effect waves-light m-l-10" id="btnsearch"><i class="fa fa-filter"></i> Tìm kiếm</button>
+                            <button class="btn btn-success waves-effect waves-light m-l-10 btnnew"><i class="fa fa-file-text-o"></i> Thêm mới
+                            </button>
+                        </div>
+                        <!--<button class="btn btn-primary waves-effect waves-light m-b-5" id="btnAddGroup"><i class="fa fa-list-ul"></i> Thêm nhóm chức năng</button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet">
+                    <div class="portlet-heading">
+                        <h3 class="portlet-title text-dark text-uppercase">
+                            Danh sách nhóm người dùng
+                        </h3>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="panel-collapse collapse in">
+                        <div class="portlet-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered dataTable" id="datatable-editable">
+                                    <thead>
+                                    <tr>
+                                        <th width="100" class="text-center">STT</th>
+                                        <th class="sorting">TÀI KHOẢN</th>
+                                        <th class="sorting">EMAIL</th>
+                                        <th class="sorting">HỌ TÊN</th>
+                                        <th class="sorting">ĐỊA CHỈ</th>
+                                        <th class="sorting">SĐT</th>
+                                        <th class="sorting">KHOÁ</th>
+                                        <th class="sorting">NGÀY TẠO</th>
+                                        <th class="sorting text-center" width="200">CHỨC NĂNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <th:block th:each="user,iter : ${lstUser}">
+                                        <tr>
+                                            <td class="text-center">[[${(iter.index + 1) + (currentpage - 1) * pageSize}]]</td>
+                                            <td>[[${user.username}]]</td>
+                                            <td>[[${user.email}]]</td>
+                                            <td>[[${user.fullname}]]</td>
+                                            <td>[[${user.address }]]</td>
+                                            <td>[[${user.phone }]]</td>
+                                            <td>
+                                                <th:block  th:if="${user.islock}">
+                                                    <span class="label label-sm label-danger">Khóa</span>
+                                                </th:block>
+                                                <th:block th:unless="${user.islock}">
+                                                    <span class="label label-sm label-success">Không khóa</span>
+                                                </th:block>
+                                            </td>
+                                            <td>[[${user.datecreate }]]</td>
+                                            <td class="actions text-center">
+                                                <a class="green btnedit" href="javascript: ;" title="Cập nhật thông tin"
+                                                   th:attr="data-id=${user.id }">
+                                                    <i class="fa fa-pencil bigger-130"></i>
+                                                </a>
+
+                                                <th:block  th:unless="${user.islock}">
+                                                    <a class="gray btnlock" href="javascript: ;" title="Khoá tài khoản"
+                                                       th:attr="data-id=${user.id }">
+                                                        <i class="fa fa-lock bigger-130"></i>
+                                                    </a>
+                                                </th:block>
+                                                <th:block th:if="${user.islock}">
+                                                    <a class="gray btnunlock" href="javascript: ;" title="Mở tài khoản"
+                                                       th:attr="data-id=${user.id }">
+                                                        <i class="fa fa-unlock-alt bigger-130"></i>
+                                                    </a>
+                                                </th:block>
+
+                                                <a class="red btndel" href="javascript: ;" title="Xoá tài khoản" th:attr="data-id=${user.id }">
+                                                    <i class="fa fa-trash-o bigger-130"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                    <input type="hidden" id="datatable" th:attr="data-total=${totalPage}, data-totalrecord=${total}, data-page=${currentpage}" />
+                                    </tbody>
+                                </table>
+                                <div class="pagecus">
+                                    <th:block th:if="${totalPage > 1}">
+                                        <div class="ht-mor-pagination page-home lo-paging">
+                                            <div class="col-xs-12 col-md-4 dv_choose_page form-inline">
+                                                <label>
+                                                    Hiển thị
+                                                    <select class="ddlpage form-control">
+                                                        <option value="2">2</option>
+                                                        <option value="20">20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                        <option value="150">150</option>
+                                                        <option value="200">200</option>
+                                                    </select>
+                                                    đơn hàng
+                                                </label>
+                                            </div>
+                                            <div class="col-xs-12 col-md-8 lo-paging-0 dv_page" style="text-align: right;">
+                                                <div class="dataTables_paginate homepagging ">
+                                                    <div class="pagination" id="pagination"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade-scale" id="userModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-check-square-o"></i> Thêm mới tài khoản</h4>
+                </div>
+                <form class="form-horizontal" id="frmForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Tên đăng nhập</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="txtusername" name="txtusername" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Họ tên</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="txtfullname" name="txtfullname" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Mật khẩu</label>
+                            <div class="col-sm-4">
+                                <input type="password" class="form-control" id="txtpassword" name="txtpassword" placeholder=""/>
+                            </div>
+                            <label class="col-sm-2 control-label">Nhập lại mật khẩu</label>
+                            <div class="col-sm-4">
+                                <input type="password" class="form-control" id="txtrepassword" name="txtrepassword" placeholder=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="txtemail" name="txtemail" placeholder="email@gmail.com"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Ngày sinh</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" data-date-format="dd/mm/yyyy" id="txtbirthday" name="txtbirthday" placeholder="mm/dd/yyyy">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">Số điện thoại</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="txtphone" name="txtphone"
+                                       placeholder="0901020304"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Địa chỉ</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="txtaddress" name="txtaddress" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Nhóm người dùng</label>
+                            <div class="col-sm-4">
+                                <select class="chosen-select form-control tag-input-style" id="slrole" name="slrole" multiple="multiple">
+                                    <th:block th:each="item: ${lstRole}">
+                                        <option th:value="${item.id }">[[${item.rolename }]]</option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">Đơn vị</label>
+                            <div class="col-sm-4">
+                                <select class="form-control chosen-select" name="slorganization" id="slorganization">
+                                    <th:block th:include="this::organization(${lstOrganizationModels}, 1)"></th:block>
+                                    <th:block th:fragment="organization(organization, lv)">
+                                        <th:block th:each="item : ${organization}">
+                                            <option th:value="${item.id }">
+                                                <span th:text="${#strings.substring('---------------------------------------------------------------', 0, lv * 3)}"></span>
+                                                 [[${item.text }]]
+                                            </option>
+                                            <th:block th:unless="${#lists.isEmpty(item.getNodes())}" th:include="this::organization(${item.getNodes()}, ${lv *2})"></th:block>
+                                        </th:block>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Khoá</label>
+                            <div class="col-sm-10">
+                                <div class="checkbox checkbox-danger">
+                                    <input name="chklock" id="islock" type="checkbox">
+                                    <label for="islock"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group lockregion">
+                            <label class="col-sm-2 control-label">Lý do khoá</label>
+                            <div class="col-sm-10">
+                                <textarea rows="3" class="form-control lockregion" name="lockregion"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5 btnsubmit" style="margin-bottom: 0;"><i class="fa fa-check-square-o"></i>
+                        Thêm mới
+                    </button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" data-dismiss="modal"><i class="fa fa-times"></i>
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" th:src="@{/assets/jquery.validate/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.twbsPagination.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/chosen.jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/assets/timepicker/bootstrap-datepicker.js}"></script>
+    <script type="text/javascript" th:src="@{/backend/users/users.js}"></script>
+</th:block>
+</body>
+</html>

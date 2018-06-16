@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+    <title></title>
+</head>
+
+<body>
+
+    <div class="left side-menu" th:fragment="menu_left">
+    <div class="sidebar-inner slimscrollleft">
+        <div class="user-details">
+            <div class="pull-left">
+                <img th:src="@{/images/users/avatar-1.jpg}" alt="" class="thumb-md img-circle">
+            </div>
+            <div class="user-info">
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Quản trị hệ thống <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:void(0)"><i class="md md-face-unlock"></i> Thông tin
+                            <div class="ripple-wrapper"></div>
+                        </a></li>
+                        <li><a href="javascript:void(0)"><i class="md md-settings"></i> Cài đặt</a></li>
+                        <li><a href="javascript:void(0)"><i class="md md-lock"></i> Khoá màn hình</a></li>
+                        <li><a href="javascript:void(0)"><i class="md md-settings-power"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
+
+                <p class="text-muted m-0">Administrator</p>
+            </div>
+        </div>
+        <!--- Divider -->
+        <div id="sidebar-menu">
+            <ul>
+                <li sec:authorize="hasAuthority('/admin/home')">
+                    <a th:href="@{/admin/home}" class="" th:class="${active == 'home'}? 'active waves-effect' : 'waves-effect'">
+                        <i class="md md-home"></i><span> Trang chủ </span>
+                    </a>
+                </li>
+                <li class="has_sub">
+                    <a href="javascript: ;" class="waves-effect">
+                        <i class="md md-face-unlock"></i><span> Quản lý khách hàng </span>
+                        <span class="pull-right"><i class="md md-add"></i></span>
+                    </a>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Quản lý thông tin khách hàng</a></li>
+                        <li><a href="#">Quản lý thông tin hợp đồng</a></li>
+                        <li><a href="#">Quản lý chăm sóc khách hàng</a></li>
+                        <li><a href="#">Quản lý công nợ khách hàng</a></li>
+                    </ul>
+                </li>
+                <li class="has_sub">
+                    <a href="javascript: ;" class="waves-effect" th:class="${active == 'abc'} ? 'subdrop' : null">
+                        <i class="md md-assignment-ind"></i><span> Quản lý danh mục </span>
+                        <span class="pull-right">
+                            <th:block th:if="${active == 'abc'}">
+                                <i class="md md-remove"></i>
+                            </th:block>
+                            <th:block th:if="${active != 'abc'}">
+                                <i class="md md-add"></i>
+                            </th:block>
+                        </span>
+                    </a>
+                    <ul class="list-unstyled" th:style="${active == 'abc'} ? 'display: block;' : null">
+                        <li><a href="#">Danh mục tỉnh thành</a></li>
+                        <li><a href="#">Danh mục phòng ban</a></li>
+                        <li><a href="#">Danh mục tổ chức</a></li>
+                        <li><a href="#">Danh mục chức vụ</a></li>
+                        <li><a href="#">Danh mục ngành nghề kinh doanh</a></li>
+                    </ul>
+                </li>
+                <li class="has_sub" sec:authorize="hasAnyAuthority('/admin/users', '/admin/roles', '/admin/permission')">
+                    <a href="javascript: ;" class="waves-effect" th:class="${(active == 'permission' or active == 'roles' or active == 'users')} ? 'subdrop' : null">
+                        <i class="md md-assignment-ind"></i><span> Quản lý người dùng </span>
+                        <span class="pull-right">
+                            <th:block th:if="${(active == 'permission' or active == 'roles' or active == 'users')}">
+                                <i class="md md-remove"></i>
+                            </th:block>
+                            <th:block th:unless="${(active == 'permission' or active == 'roles' or active == 'users')}">
+                                <i class="md md-add"></i>
+                            </th:block>
+                        </span>
+                    </a>
+                    <ul sec:authorize="hasAnyAuthority('/admin/users', '/admin/roles', '/admin/permission')" class="list-unstyled" th:style="${(active == 'permission' or active == 'roles' or active == 'users')} ? 'display: block;' : null">
+                        <li sec:authorize="hasAuthority('/admin/users')" th:class="${active == 'users'} ? 'active' : null"><a th:href="@{/admin/users}">Quản lý người dùng</a></li>
+                        <li sec:authorize="hasAuthority('/admin/roles')" th:class="${active == 'roles'} ? 'active' : null"><a th:href="@{/admin/roles}">Quản lý nhóm người dùng</a></li>
+                        <li sec:authorize="hasAuthority('/admin/permission')" th:class="${active == 'permission'} ? 'active' : null"><a th:href="@{/admin/permission}">Quản lý chức năng</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+</body>
+
+</html>
+

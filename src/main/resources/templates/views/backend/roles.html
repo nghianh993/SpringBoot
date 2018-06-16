@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      layout:decorator="layouts/admin">
+<head>
+    <title>Quản lý nhóm người dùng - Hệ thống hỗ trợ khách hàng VNPOST</title>
+    <th:block th:fragment="css">
+        <link th:href="@{/css/chosen.min.css}" rel="stylesheet" type="text/css" />
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 class="pull-left page-title">QUẢN LÝ NHÓM NGƯỜI DÙNG</h4>
+                <ol class="breadcrumb pull-right">
+                    <li><a th:href="@{/admin/home}">Trang chủ</a></li>
+                    <li class="active">Quản lý nhóm người dùng</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <!--<div class="panel-heading">
+                    </div>-->
+                    <div class="panel-body">
+                        <div class="form-inline" role="form">
+                            <div class="form-group col-sm-4 col-xs-12">
+                                <input type="text" class="form-control" style="width: 100%;" id="txtsearchbox" placeholder="Nhập vào tên nhóm người dùng...">
+                            </div>
+                            <button class="btn btn-info waves-effect waves-light m-l-10" id="btnsearchrole"><i class="fa fa-filter"></i> Tìm kiếm</button>
+                            <button class="btn btn-success waves-effect waves-light m-l-10 btnaddnew"><i class="fa fa-file-text-o"></i> Thêm nhóm
+                            </button>
+                        </div>
+                        <!--<button class="btn btn-primary waves-effect waves-light m-b-5" id="btnAddGroup"><i class="fa fa-list-ul"></i> Thêm nhóm chức năng</button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet">
+                    <div class="portlet-heading">
+                        <h3 class="portlet-title text-dark text-uppercase">
+                            Danh sách nhóm người dùng
+                        </h3>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="panel-collapse collapse in">
+                        <div class="portlet-body">
+                            <div class="table-responsive">
+                                    <table class="table table-bordered dataTable" id="datatable-editable">
+                                    <thead>
+                                    <tr>
+                                        <th width="100" class="text-center">STT</th>
+                                        <th class="sorting">TÊN NHÓM</th>
+                                        <th class="sorting text-center" width="200">CHỨC NĂNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <th:block th:each="item,iter : ${lstRole}">
+                                            <tr>
+                                                <td class="text-center">[[${(iter.index + 1) + (currentpage - 1) * pageSize}]]</td>
+                                                <td>[[${item.rolename}]]</td>
+                                                <td class="actions text-center">
+                                                    <a href="javascript: ;" th:attr="data-id=${item.id}" class="on-default edit-row btnedit" title="Cập nhật thông tin nhóm người dùng"><i class="fa fa-pencil"></i></a>
+                                                    <a href="javascript: ;" th:attr="data-id=${item.id}" class="on-default remove-row btndelete" title="Xoá nhóm người dùng"><i class="fa fa-trash-o"></i></a>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                        <input type="hidden" id="datatable" th:attr="data-total=${totalPage}, data-totalrecord=${total}, data-page=${currentpage}" />
+                                    </tbody>
+                                </table>
+                                <div class="pagecus">
+                                    <th:block th:if="${totalPage > 1}">
+                                        <div class="ht-mor-pagination page-home lo-paging">
+                                            <div class="col-xs-12 col-md-4 dv_choose_page form-inline">
+                                                <label>
+                                                    Hiển thị
+                                                    <select class="ddlpage form-control">
+                                                        <option value="2">2</option>
+                                                        <option value="20">20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                        <option value="150">150</option>
+                                                        <option value="200">200</option>
+                                                    </select>
+                                                    đơn hàng
+                                                </label>
+                                            </div>
+                                            <div class="col-xs-12 col-md-8 lo-paging-0 dv_page" style="text-align: right;">
+                                                <div class="dataTables_paginate homepagging ">
+                                                    <div class="pagination" id="pagination"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade-scale" id="GroupModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-check-square-o"></i> Thêm mới nhóm người dùng</h4>
+                </div>
+                <form class="form-horizontal" id="frmForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Tên nhóm quyền</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="txtrolename" name="txtrolename"
+                                       placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Phân quyền chức năng</label>
+                            <div class="col-sm-9">
+                                <select class="chosen-select form-control tag-input-style" id="slper" name="slper" multiple="multiple">
+                                    <th:block th:each="item : ${lstDataPer}">
+                                        <optgroup th:label="${ item.name}">
+                                            <th:block th:if="${ item.getPermissions() != null && item.getPermissions().size() > 0 }">
+                                                <th:block th:each="permission : ${item.getPermissions() }">
+                                                    <option th:value="${permission.id }">[[${ permission.description }]]</option>
+                                                </th:block>
+                                            </th:block>
+                                        </optgroup>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5 btnModal" style="margin-bottom: 0;"><i class="fa fa-check-square-o"></i>
+                        Thêm mới
+                    </button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" data-dismiss="modal"><i class="fa fa-times"></i>
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" th:src="@{/assets/jquery.validate/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.twbsPagination.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/chosen.jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/backend/roles/roles.js}"></script>
+</th:block>
+</body>
+</html>

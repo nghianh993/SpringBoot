@@ -1,0 +1,41 @@
+<th:block th:each="user,iter : ${lstUser}">
+    <tr>
+        <td class="text-center">[[${(iter.index + 1) + (currentpage - 1) * pageSize}]]</td>
+        <td>[[${user.username}]]</td>
+        <td>[[${user.email}]]</td>
+        <td>[[${user.fullname}]]</td>
+        <td>[[${user.address }]]</td>
+        <td>[[${user.phone }]]</td>
+        <td>
+            <th:block  th:if="${user.islock}">
+                <span class="label label-sm label-danger">Khóa</span>
+            </th:block>
+            <th:block th:unless="${user.islock}">
+                <span class="label label-sm label-success">Không khóa</span>
+            </th:block>
+        </td>
+        <td>[[${user.datecreate }]]</td>
+        <td class="actions text-center">
+            <a class="green btnedit" href="javascript: ;" title="Cập nhật thông tin"
+               th:attr="data-id=${user.id }">
+                <i class="fa fa-pencil bigger-130"></i>
+            </a>
+            <th:block  th:unless="${user.islock}">
+                <a class="gray btnlock" href="javascript: ;" title="Khoá tài khoản"
+                   th:attr="data-id=${user.id }">
+                    <i class="fa fa-lock bigger-130"></i>
+                </a>
+            </th:block>
+            <th:block th:if="${user.islock}">
+                <a class="gray btnunlock" href="javascript: ;" title="Mở tài khoản"
+                   th:attr="data-id=${user.id }">
+                    <i class="fa fa-unlock-alt bigger-130"></i>
+                </a>
+            </th:block>
+            <a class="red btndel" href="javascript: ;" title="Xoá tài khoản" th:attr="data-id=${user.id }">
+                <i class="fa fa-trash-o bigger-130"></i>
+            </a>
+        </td>
+    </tr>
+</th:block>
+<input type="hidden" id="datatable" th:attr="data-total=${totalPage}, data-totalrecord=${total}, data-page=${currentpage}" />
